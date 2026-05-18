@@ -1,0 +1,163 @@
+# Ablation Study Configuration - Deformation Field
+
+experiment:
+  name: "Ablation_Study_Deformation"
+  description: "Systematic ablation study to evaluate the contribution of deformation field components"
+
+  # Experiment variants for comparison
+  variants:
+    - name: "Static3DGS_Baseline"
+      description: "Baseline: Static 3D Gaussian Splatting without any dynamic modeling"
+
+      model:
+        num_gaussians: 10000
+        max_time_steps: 100
+        embedding_dim: 64
+        num_embeddings: 512
+
+        deformation_field: false
+        temporal_loss: false
+        occlusion_aware: false
+        hierarchical_pool: false
+
+        renderer:
+          depth_sorting: true
+          alpha_blending: true
+          occlusion_threshold: 0.5
+
+      training:
+        batch_size: 4
+        learning_rate: 0.001
+        max_epochs: 1000
+
+    - name: "w_DeformationOnly"
+      description: "With deformation field only, no temporal constraints"
+
+      model:
+        num_gaussians: 10000
+        max_time_steps: 100
+        embedding_dim: 64
+        num_embeddings: 512
+
+        deformation_field: true
+        temporal_loss: false
+        occlusion_aware: false
+        hierarchical_pool: false
+
+        renderer:
+          depth_sorting: true
+          alpha_blending: true
+          occlusion_threshold: 0.5
+
+      training:
+        batch_size: 4
+        learning_rate: 0.001
+        max_epochs: 1000
+
+    - name: "w_TemporalLoss"
+      description: "With deformation field and temporal loss, no occlusion handling"
+
+      model:
+        num_gaussians: 10000
+        max_time_steps: 100
+        embedding_dim: 64
+        num_embeddings: 512
+
+        deformation_field: true
+        temporal_loss: true
+        occlusion_aware: false
+        hierarchical_pool: false
+
+        renderer:
+          depth_sorting: true
+          alpha_blending: true
+          occlusion_threshold: 0.5
+
+      training:
+        batch_size: 4
+        learning_rate: 0.001
+        max_epochs: 1000
+
+    - name: "w_OcclusionAware"
+      description: "With deformation field and occlusion-aware rendering"
+
+      model:
+        num_gaussians: 10000
+        max_time_steps: 100
+        embedding_dim: 64
+        num_embeddings: 512
+
+        deformation_field: true
+        temporal_loss: true
+        occlusion_aware: true
+        hierarchical_pool: false
+
+        renderer:
+          depth_sorting: true
+          alpha_blending: true
+          occlusion_threshold: 0.5
+
+      training:
+        batch_size: 4
+        learning_rate: 0.001
+        max_epochs: 1000
+
+    - name: "FullModel"
+      description: "Complete model with all components"
+
+      model:
+        num_gaussians: 10000
+        max_time_steps: 100
+        embedding_dim: 64
+        num_embeddings: 512
+
+        deformation_field: true
+        temporal_loss: true
+        occlusion_aware: true
+        hierarchical_pool: true
+
+        renderer:
+          depth_sorting: true
+          alpha_blending: true
+          occlusion_threshold: 0.5
+
+      training:
+        batch_size: 4
+        learning_rate: 0.001
+        max_epochs: 1000
+
+# Evaluation Protocol
+evaluation:
+  common_settings:
+    dataset: "nvidia_dynamic"
+    metrics: ["PSNR", "SSIM", "LPIPS", "FVD"]
+    test_batches: 10
+    save_renders: true
+
+  variant_specific:
+    Static3DGS_Baseline:
+      notes: "Expected to fail on dynamic sequences due to lack of motion modeling"
+
+    w_DeformationOnly:
+      notes: "Should show improved temporal consistency but may have occlusion issues"
+
+    w_TemporalLoss:
+      notes: "Should demonstrate better motion smoothness"
+
+    w_OcclusionAware:
+      notes: "Should handle complex occlusions better"
+
+    FullModel:
+      notes: "Expected best performance across all metrics"
+
+# Analysis Plan
+analysis:
+  statistical_testing: true
+  confidence_interval: 95
+  significance_level: 0.05
+
+  visualization:
+    comparison_plots: true
+    error_maps: true
+    ablation_curves: true
+    statistical_tables: true

@@ -1,0 +1,74 @@
+# HyperNeRF Dataset Configuration
+
+dataset:
+  name: "HyperNeRF_Dataset"
+  path: "./data/hypernerf"
+  type: "multiview_dynamic"
+
+  # Data Loading
+  train:
+    num_frames: 120
+    frame_interval: 1
+    start_frame: 0
+    end_frame: 119
+    shuffle: true
+
+  val:
+    num_frames: 24
+    frame_interval: 5
+    start_frame: 120
+    end_frame: 143
+    shuffle: false
+
+  test:
+    num_frames: 24
+    frame_interval: 10
+    start_frame: 144
+    end_frame: 167
+    shuffle: false
+
+  # Image Processing
+  image_size: [800, 800]
+  normalize_rgb: true
+  rgb_range: [-1.0, 1.0]
+
+  # Camera Parameters
+  camera:
+    intrinsics: "calibrated"
+    extrinsics: "gt"  # High-quality ground truth poses
+
+  # Scene Information
+  scene_type: "dynamic"
+  motion_type: ["human", "animal", "object"]
+  occlusion_level: "medium"
+
+  # Augmentation (Training Only)
+  train_augmentation:
+    random_flip: true
+    color_jitter: true
+    brightness: 0.1
+    contrast: 0.1
+    saturation: 0.1
+    hue: 0.1
+    crop_size: [768, 768]
+    scale_range: [0.9, 1.1]
+
+  # Validation/Test Augmentation
+  eval_augmentation:
+    random_flip: false
+    color_jitter: false
+    brightness: 0.0
+    contrast: 0.0
+    saturation: 0.0
+    hue: 0.0
+    crop_size: null
+
+  # Data Format
+  format: "png"
+  compression_level: 1
+
+  # Metadata
+  metadata_file: "metadata.json"
+  camera_params_file: "cameras_sphere.npz"
+  poses_file: "transforms_train.json"
+  time_file: "times.txt"

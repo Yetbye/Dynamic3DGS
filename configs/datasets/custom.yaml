@@ -1,0 +1,81 @@
+# Custom Dataset Template
+
+dataset:
+  name: "Custom_Dataset"
+  path: "./data/custom_dataset"
+  type: "monocular_video"  # or "multiview_dynamic"
+
+  # Data Loading Configuration
+  train:
+    num_frames: 60
+    frame_interval: 1
+    start_frame: 0
+    end_frame: 59
+    shuffle: true
+
+  val:
+    num_frames: 12
+    frame_interval: 5
+    start_frame: 60
+    end_frame: 71
+    shuffle: false
+
+  test:
+    num_frames: 12
+    frame_interval: 10
+    start_frame: 72
+    end_frame: 83
+    shuffle: false
+
+  # Image Settings
+  image_size: [512, 512]  # Override this for different resolutions
+  normalize_rgb: true
+  rgb_range: [-1.0, 1.0]
+
+  # Camera Settings
+  camera:
+    intrinsics: "estimated"  # Options: "calibrated", "estimated", "none"
+    extrinsics: "estimated"  # Options: "gt", "estimated", "none"
+
+  # Scene Characteristics
+  scene_type: "dynamic"
+  motion_type: ["object"]  # Specify expected motion types
+  occlusion_level: "low"   # "low", "medium", "high"
+
+  # Augmentation (Training)
+  train_augmentation:
+    random_flip: true
+    color_jitter: true
+    brightness: 0.1
+    contrast: 0.1
+    saturation: 0.1
+    hue: 0.1
+    crop_size: [480, 480]
+    scale_range: [0.8, 1.2]
+
+  # Evaluation Augmentation
+  eval_augmentation:
+    random_flip: false
+    color_jitter: false
+    brightness: 0.0
+    contrast: 0.0
+    saturation: 0.0
+    hue: 0.0
+    crop_size: null
+
+  # File Format
+  format: "png"  # "png", "jpg", "tiff"
+  compression_level: 1
+
+  # Metadata Files (Customize these paths)
+  metadata_file: "metadata.json"
+  camera_params_file: "cameras.npz"
+  poses_file: "poses_bounds.npy"
+  time_file: "times.txt"  # Required for temporal datasets
+
+# Usage Instructions:
+# 1. Update the dataset.name and dataset.path
+# 2. Adjust num_frames and frame intervals based on your data
+# 3. Set camera parameters according to your calibration quality
+# 4. Modify augmentation settings as needed
+# 5. Update file paths to match your data structure

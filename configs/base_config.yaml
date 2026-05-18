@@ -1,0 +1,107 @@
+# Dynamic3DGS Base Configuration
+
+# Experiment Settings
+experiment:
+  name: "dynamic_3dgs"
+  description: "Deformable 3D Gaussian Splatting for Dynamic Scenes"
+  seed: 42
+  device: "cuda"
+  num_workers: 8
+
+# Model Architecture
+model:
+  # Deformable Gaussian Parameters
+  num_gaussians: 10000
+  max_time_steps: 100
+  embedding_dim: 64
+  num_embeddings: 512
+
+  # Deformation Field Network
+  deformation_field:
+    input_dim: 4  # (x, y, z, t)
+    output_dim: 3  # position offset
+    hidden_dims: [128, 128, 128]
+    activation: "sine"  # SIREN activation function
+    use_layer_norm: true
+
+  # Rendering Parameters
+  renderer:
+    depth_sorting: true
+    alpha_blending: true
+    occlusion_threshold: 0.5
+    background_color: [0.0, 0.0, 0.0]
+
+# Training Configuration
+training:
+  batch_size: 4
+  learning_rate: 0.001
+  weight_decay: 0.0
+  max_epochs: 1000
+  warmup_epochs: 50
+
+  # Loss Weights
+  loss_weights:
+    reconstruction: 1.0
+    temporal_consistency: 0.1
+    motion_smoothness: 0.05
+    rigidity_constraint: 0.02
+    regularization: 0.01
+
+  # Optimizer Settings
+  optimizer:
+    type: "AdamW"
+    lr_schedule: "cosine_with_warmup"
+    betas: [0.9, 0.999]
+    eps: 1e-8
+
+# Dataset Configuration
+dataset:
+  type: "monocular_video"
+  frame_interval: 1
+  train_frames: 100
+  val_frames: 20
+  test_frames: 20
+
+  augmentation:
+    random_flip: true
+    color_jitter: 0.2
+    crop_size: [512, 512]
+    brightness: 0.1
+    contrast: 0.1
+    saturation: 0.1
+    hue: 0.1
+
+  camera:
+    intrinsics: "calibrated"
+    extrinsics: "estimated"
+
+# Logging and Checkpointing
+logging:
+  tensorboard: true
+  wandb: false
+  log_interval: 10
+  checkpoint_interval: 100
+  save_best_only: true
+
+  # Monitoring
+  monitor_metric: "val_psnr"
+  monitor_mode: "max"
+
+# Evaluation Settings
+evaluation:
+  metrics: ["PSNR", "SSIM", "LPIPS", "FVD"]
+  test_batches: 10
+  save_renders: true
+  render_videos: true
+
+# Hardware Settings
+hardware:
+  mixed_precision: true
+  gradient_accumulation_steps: 4
+  find_unused_parameters: false
+
+# Debug Settings
+debug:
+  profile_memory: false
+  save_gradients: false
+  verbose_training: false

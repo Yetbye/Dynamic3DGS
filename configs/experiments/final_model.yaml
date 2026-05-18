@@ -1,0 +1,103 @@
+# Final Model Configuration
+
+experiment:
+  name: "Dynamic3DGS_Final"
+  description: "Final model configuration for comprehensive evaluation"
+
+  model:
+    # Core Architecture
+    num_gaussians: 15000  # Increased for better detail capture
+    max_time_steps: 120   # Extended temporal range
+    embedding_dim: 64
+    num_embeddings: 1024  # Larger codebook
+
+    # Deformation Field Network
+    deformation_field:
+      input_dim: 4  # (x, y, z, t)
+      output_dim: 3  # position offset
+      hidden_dims: [256, 256, 128, 128]  # Deeper network
+      activation: "sine"  # SIREN activation
+      use_layer_norm: true
+      dropout: 0.1
+
+    # Hierarchical Gaussian Pool
+    hierarchical_pool:
+      enabled: true
+      levels: 3
+      gaussian_ratios: [0.7, 0.2, 0.1]
+      level_details: [1000, 3000, 11000]
+
+    # Advanced Rendering
+    renderer:
+      depth_sorting: true
+      alpha_blending: true
+      occlusion_threshold: 0.5
+      background_color: [0.0, 0.0, 0.0]
+      adaptive_splats: true
+      importance_sampling: true
+
+  training:
+    batch_size: 8  # Larger batch for better gradient estimation
+    learning_rate: 0.0008
+    weight_decay: 0.0001
+    max_epochs: 2000
+    warmup_epochs: 100
+
+    # Advanced Optimization
+    optimizer:
+      type: "AdamW"
+      lr_schedule: "cosine_with_warmup"
+      betas: [0.9, 0.999]
+      eps: 1e-8
+      grad_clip: 1.0
+
+    # Loss Weights (Fine-tuned)
+    loss_weights:
+      reconstruction: 1.0
+      temporal_consistency: 0.15
+      motion_smoothness: 0.08
+      rigidity_constraint: 0.03
+      regularization: 0.02
+
+    # Training Schedule
+    checkpoint_interval: 50
+    validation_interval: 25
+    early_stopping_patience: 200
+
+  dataset:
+    type: "monocular_video"
+    frame_interval: 1
+    train_frames: 120
+    val_frames: 24
+    test_frames: 24
+
+    augmentation:
+      random_flip: true
+      color_jitter: true
+      brightness: 0.1
+      contrast: 0.1
+      saturation: 0.1
+      hue: 0.1
+      crop_size: [512, 512]
+      scale_range: [0.9, 1.1]
+
+  evaluation:
+    metrics: ["PSNR", "SSIM", "LPIPS", "FVD", "TemporalSSIM"]
+    test_batches: 20
+    save_renders: true
+    render_videos: true
+    generate_qualitative_results: true
+
+  hardware:
+    mixed_precision: true
+    gradient_accumulation_steps: 2
+    find_unused_parameters: false
+
+  logging:
+    tensorboard: true
+    wandb: true
+    log_interval: 5
+    checkpoint_interval: 50
+    save_best_only: true
+    monitor_metric: "val_psnr"
+    monitor_mode: "max"

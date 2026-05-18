@@ -1,0 +1,73 @@
+# Nvidia Dynamic Dataset Configuration
+
+dataset:
+  name: "Nvidia_Dynamic_Dataset"
+  path: "./data/nvidia_dynamic"
+  type: "monocular_video"
+
+  # Data Loading
+  train:
+    num_frames: 100
+    frame_interval: 1
+    start_frame: 0
+    end_frame: 99
+    shuffle: true
+
+  val:
+    num_frames: 20
+    frame_interval: 5
+    start_frame: 100
+    end_frame: 119
+    shuffle: false
+
+  test:
+    num_frames: 20
+    frame_interval: 10
+    start_frame: 120
+    end_frame: 139
+    shuffle: false
+
+  # Image Processing
+  image_size: [512, 512]
+  normalize_rgb: true
+  rgb_range: [-1.0, 1.0]
+
+  # Camera Parameters
+  camera:
+    intrinsics: "calibrated"  # "calibrated", "estimated", or "none"
+    extrinsics: "estimated"   # "estimated", "gt", or "none"
+
+  # Scene Information
+  scene_type: "dynamic"
+  motion_type: ["human", "vehicle", "object"]  # Expected motion types
+  occlusion_level: "medium"  # "low", "medium", "high"
+
+  # Augmentation (Training Only)
+  train_augmentation:
+    random_flip: true
+    color_jitter: true
+    brightness: 0.1
+    contrast: 0.1
+    saturation: 0.1
+    hue: 0.1
+    crop_size: [480, 480]  # Random crop size
+    scale_range: [0.8, 1.2]
+
+  # Validation/Test Augmentation
+  eval_augmentation:
+    random_flip: false
+    color_jitter: false
+    brightness: 0.0
+    contrast: 0.0
+    saturation: 0.0
+    hue: 0.0
+    crop_size: null  # Use full resolution
+
+  # Data Format
+  format: "png"  # "png", "jpg", "tiff"
+  compression_level: 1  # For lossless compression
+
+  # Metadata
+  metadata_file: "metadata.json"
+  camera_params_file: "cameras.npz"
+  poses_file: "poses_bounds.npy"
